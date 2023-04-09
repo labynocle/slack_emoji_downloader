@@ -1,4 +1,7 @@
 # slack_emoji_downloader
+
+![example workflow](https://github.com/labynocle/slack_emoji_downloader/actions/workflows/go.yml/badge.svg)
+
 Tiny go script to download all custom emoji of a given Slack space
 
 It's just an excuse to discover how Golang is working ^^
@@ -25,3 +28,4 @@ ToDo:
 
 * add basic tests
 * add github ci
+* use https://github.com/spf13/viper to create real CLI
