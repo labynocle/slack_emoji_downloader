@@ -5,17 +5,13 @@ import (
 	"log"
 )
 
-
-
-
 func main() {
+	progName := "slack_emoji_downloader"
 
-	prog_name := "slack_emoji_downloader"
+	log.SetPrefix(progName + ": ")
+	log.SetFlags(0)
 
-	log.SetPrefix(prog_name + ": ")
-    log.SetFlags(0)
-
-    http_client := httpClient()
+	http_client := httpClient()
 
 	log.Println("INFO: Get emojis list")
 	listEmojis, err := httpGetListEmojis(http_client)
@@ -26,21 +22,20 @@ func main() {
 	how_many_emojis := 0
 	how_many_aliases := 0
 
-	for emoji_name, emoji_url := range listEmojis {
-		emoji_full_path := fileDefinePath(emoji_name, emoji_url)
+	for emojiName, emojiUrl := range listEmojis {
+		emojiFullPath := fileDefinePath(emojiName, emojiUrl)
 
-		is_alias, _ := isAlias(emoji_url)
+		is_alias, _ := isAlias(emojiUrl)
     	if is_alias {
-			log.Printf("INFO: Do not download %v", emoji_name)
+			log.Printf("INFO: Do not download %v", emojiName)
 			how_many_aliases++
 			continue
 		}
 
-		log.Printf("INFO: Download %v as %v", emoji_url, emoji_full_path)
+		log.Printf("INFO: Download %v as %v", emojiUrl, emojiFullPath)
 
-		download_err := httpDownloadEmoji(http_client, emoji_full_path, emoji_url)
-		if download_err != nil {
-			log.Fatal("FATAL: ", download_err)
+		if downloadErr := httpDownloadEmoji(http_client, emojiFullPath, emojiUrl); downloadErr != nil {
+			log.Fatal("FATAL: ", downloadErr)
 		}
 
 		// Every 100 emojis let's sleep 2 seconds
@@ -53,5 +48,4 @@ func main() {
 	log.Printf("------------------------------")
 	log.Printf("INFO: Success to download %v emojis", how_many_emojis)
 	log.Printf("INFO: Don't download %v aliases", how_many_aliases)
-
 }

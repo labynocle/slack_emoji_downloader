@@ -3,21 +3,20 @@ package main
 import (
     "net/http"
     "time"
-	"errors"
 	"os"
 	"encoding/json"
 	"io"
+	"fmt"
 )
 
-var SLACK_TOKEN = os.Getenv("SLACK_TOKEN")
-var SLACK_URL = os.Getenv("SLACK_URL")
+var slackToken = os.Getenv("SLACK_TOKEN")
+var slackUrl = os.Getenv("SLACK_URL")
 
-type slack_emoji_resp struct {
-	Ok bool `json:"ok"`
-	Emoji map[string]string `json:"emoji"`
-	Cache_ts string `json:"cache_ts"`
+type slackEmojiResp struct {
+	Ok       bool              `json:"ok"`
+	Emoji    map[string]string `json:"emoji"`
+	Cache_ts string            `json:"cache_ts"`
 }
-
 
 func httpClient() *http.Client {
 	client := &http.Client{Timeout: 10 * time.Second}
@@ -27,12 +26,12 @@ func httpClient() *http.Client {
 func httpDownloadEmoji(client *http.Client, filepath string, url string) error {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return errors.New("httpDownloadEmoji - Unable to forge GET request")
+		return fmt.Errorf("httpDownloadEmoji - Unable to forge GET request: %w", err)
 	}
 
     resp, err := client.Do(req)
 	if err != nil {
-		return errors.New("httpDownloadEmoji - Unable to download")
+		return fmt.Errorf("httpDownloadEmoji - Unable to downlowd: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -40,46 +39,45 @@ func httpDownloadEmoji(client *http.Client, filepath string, url string) error {
 	dirpath := dirDefinePath(filepath)
 	if _, err := os.Stat(dirpath); os.IsNotExist(err) {
 		if err := os.MkdirAll(dirpath, os.ModePerm); err != nil {
-			return errors.New("httpDownloadEmoji - Unable to create directory")
+			return fmt.Errorf("httpDownloadEmoji - Unable to create directory: %w", err)
 		}
 	}
 
 	out, err := os.Create(filepath)
 	if err != nil {
-		return errors.New("httpDownloadEmoji - Unable to write file locally")
+		return fmt.Errorf("httpDownloadEmoji - Unable to write file locally: %w", err)
 	}
 
 	defer out.Close()
 
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return errors.New("httpDownloadEmoji - Unable to finish writing file locally")
+	if _, err = io.Copy(out, resp.Body); err != nil {
+		return fmt.Errorf("httpDownloadEmoji - Unable to finish writing file locally: %w", err)
 	}
 
 	return nil
 }
 
 func httpGetListEmojis(client *http.Client) (map[string]string, error) {
-	req, err := http.NewRequest("GET", SLACK_URL + "/api/emoji.list", nil)
+	req, err := http.NewRequest("GET", slackUrl + "/api/emoji.list", nil)
 	if err != nil {
-		return nil, errors.New("httpGetListEmojis - Unable to forge GET request")
+		return nil, fmt.Errorf("httpGetListEmojis - Unable to forge GET request: %w", err)
 	}
 
-    req.Header.Add("Authorization", "Bearer " + SLACK_TOKEN)
+    req.Header.Add("Authorization", "Bearer " + slackToken)
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.New("httpGetListEmojis - Unable to process GET")
+		return nil, fmt.Errorf("httpGetListEmojis - Unable to process GET: %w", err)
 	}
 
     defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.New("httpGetListEmojis - Unable to read response body")
+		return nil, fmt.Errorf("httpGetListEmojis - Unable to read response body: %w", err)
 	}
 
-	var target slack_emoji_resp
+	var target slackEmojiResp
 	json.Unmarshal(body, &target)
 
 	return target.Emoji, nil

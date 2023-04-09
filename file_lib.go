@@ -5,14 +5,15 @@ import (
 	"github.com/gosimple/slug"
 )
 
-var DOWNLOAD_DIRECTORY = "/tmp/emojis"
+var downloadDirectory = "/tmp/emojis"
 
-func fileDefinePath(emoji_name string, emoji_url string) string {
-	emoji_slug_name := slug.Make(emoji_name)
-	return DOWNLOAD_DIRECTORY + "/" + emoji_slug_name[0:1] + "/" + emoji_slug_name + filepath.Ext(emoji_url)
+func fileDefinePath(emojiName string, emojiURL string) string {
+	emojiSlugName := slug.Make(emojiName)
+    emojiExtension := filepath.Ext(emojiURL)
+    return filepath.Join(downloadDirectory, emojiSlugName[0:1], emojiSlugName+emojiExtension)
 }
 
 
-func dirDefinePath(emoji_full_path string) string {
-	return filepath.Dir(emoji_full_path)
+func dirDefinePath(emojiFullPath string) string {
+	return filepath.Dir(emojiFullPath)
 }
