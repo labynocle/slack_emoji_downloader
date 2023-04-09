@@ -9,7 +9,14 @@ Usage:
 export SLACK_TOKEN=xoxb-XXXX-XXXX-XXXX
 export SLACK_URL=https://YOUR-NAME.slack.com
 
-go run .
+# Launch download
+make run
+
+# Launch the tests
+make test
+
+# Display help
+make
 ```
 
 All emojis will be found in `/tmp/emojis` directory
@@ -17,6 +24,4 @@ All emojis will be found in `/tmp/emojis` directory
 ToDo:
 
 * add basic tests
-* add Makefile
 * add github ci
-* better doc
