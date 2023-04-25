@@ -26,6 +26,4 @@ All emojis will be found in `/tmp/emojis` directory
 
 ToDo:
 
-* add basic tests
-* add github ci
 * use https://github.com/spf13/viper to create real CLI

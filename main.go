@@ -19,16 +19,23 @@ func main() {
 		log.Fatal("FATAL: ", err)
 	}
 
-	how_many_emojis := 0
-	how_many_aliases := 0
+	howManyEmojis := 0
+	howManyAliases := 0
+	howManyNoslugify := 0
 
 	for emojiName, emojiUrl := range listEmojis {
-		emojiFullPath := fileDefinePath(emojiName, emojiUrl)
+		emojiFullPath, err := fileDefinePath(emojiName, emojiUrl)
+
+		if err != nil {
+			log.Printf("INFO: Do not download %v because unable to slugify", emojiName)
+			howManyNoslugify++
+			continue
+		}
 
 		is_alias, _ := isAlias(emojiUrl)
-    	if is_alias {
-			log.Printf("INFO: Do not download %v", emojiName)
-			how_many_aliases++
+		if is_alias {
+			log.Printf("INFO: Do not download %v because it's an alias", emojiName)
+			howManyAliases++
 			continue
 		}
 
@@ -39,13 +46,14 @@ func main() {
 		}
 
 		// Every 100 emojis let's sleep 2 seconds
-		how_many_emojis++
-		if how_many_emojis%100 == 0 {
+		howManyEmojis++
+		if howManyEmojis%100 == 0 {
 			time.Sleep(2 * time.Second)
 		}
 	}
 
 	log.Printf("------------------------------")
-	log.Printf("INFO: Success to download %v emojis", how_many_emojis)
-	log.Printf("INFO: Don't download %v aliases", how_many_aliases)
+	log.Printf("INFO: Success to download %v emojis", howManyEmojis)
+	log.Printf("INFO: Don't download %v aliases", howManyAliases)
+	log.Printf("INFO: Don't download %v slugify", howManyNoslugify)
 }
