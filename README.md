@@ -9,6 +9,7 @@ It's just an excuse to discover how Golang is working ^^
 Usage:
 
 ```
+# Please note the slack token should have the emoji:read scope
 export SLACK_TOKEN=xoxb-XXXX-XXXX-XXXX
 export SLACK_URL=https://YOUR-NAME.slack.com
 
